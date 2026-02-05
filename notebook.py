@@ -6,7 +6,8 @@ app = marimo.App(width="medium")
 
 @app.cell
 def _(test):
-    test
+    test2
+
     return
 
 
