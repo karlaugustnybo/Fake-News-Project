@@ -103,6 +103,7 @@ Read `Project-description.md` for the full project requirements, deadlines, and 
 
 3. **Push**
    ```zsh
+   git add .
    git commit -m "Your commit message"
    git push
    ```

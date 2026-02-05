@@ -5,5 +5,8 @@ from rich import print
 def main():
     print("[bold #add8e6]Project Started.[/bold #add8e6]")
 
+def test2():
+    print("hello from test2")
+
 if __name__ == "__main__":
     main()

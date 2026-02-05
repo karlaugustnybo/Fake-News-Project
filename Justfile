@@ -4,7 +4,7 @@ run:
     uv run python main.py
 
 notebook:
-    uv run marimo edit notebook.py
+    uv run marimo edit notebook.py --watch
 
 check:
     uv run ty check .
