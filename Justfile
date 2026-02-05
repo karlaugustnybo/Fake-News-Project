@@ -18,3 +18,8 @@ test:
 
 clean:
     rm -rf __pycache__ .pytest_cache .ruff_cache
+
+push:
+    git add .
+    git commit -m "Update"
+    git push
