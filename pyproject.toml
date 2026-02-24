@@ -1,0 +1,32 @@
+[project]
+name = "fake-news-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "altair>=6.0.0",
+    "duckdb>=1.4.4",
+    "jupyter>=1.1.1",
+    "marimo>=0.19.7",
+    "nbformat>=5.10.4",
+    "numpy>=2.4.2",
+    "polars[pyarrow]>=1.37.1",
+    "pydantic-ai>=1.52.0",
+    "rich>=14.3.2",
+    "scikit-learn>=1.8.0",
+    "sqlglot>=28.9.0",
+    "torch>=2.10.0",
+    "vegafusion>=2.0.3",
+    "vl-convert-python>=1.9.0.post1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "python-lsp-ruff>=2.3.0",
+    "python-lsp-server>=1.14.0",
+    "ruff>=0.15.0",
+    "ty>=0.0.14",
+    "websockets>=15.0.1",
+]
