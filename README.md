@@ -1,6 +1,6 @@
 # Fake News Prediction Project
 
-## 📋 Quick Start
+## Quick Start
 
 ### Prerequisites
 - **Python 3.14+** (managed via `.python-version`)
@@ -23,7 +23,7 @@
 
 ---
 
-## 🚀 Running the Project
+## Running the Project
 
 Use `just` to run common commands:
 
@@ -38,7 +38,7 @@ Use `just` to run common commands:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 Fake-News-Project/
@@ -55,7 +55,7 @@ Fake-News-Project/
 
 ---
 
-## 🛠 Key Technologies
+## Key Technologies
 
 | Tool / Library     | Purpose                                      |
 |-------------------|---------------------------------------------|
@@ -64,14 +64,11 @@ Fake-News-Project/
 | **scikit-learn**  | Machine learning models                     |
 | **PyTorch**       | Deep learning framework                     |
 | **Marimo**        | Reactive Python notebooks                   |
-| **DuckDB**        | In-process SQL database                     |
-| **Pydantic AI**   | AI integrations (optional)                  |
-| **WandB**         | Experiment tracking                         |
 | **Rich**          | Pretty terminal output                      |
 
 ---
 
-## 🔧 Development Tools
+## Development Tools
 
 - **Ruff** – Linting and formatting
 - **ty** – Type checking
@@ -81,13 +78,13 @@ Run `just format` before committing to keep the code clean!
 
 ---
 
-## 📖 Assignment Details
+## Assignment Details
 
 Read `Project-description.md` for the full project requirements, deadlines, and deliverables.
 
 ---
 
-## 👥 Team Workflow
+## Team Workflow
 
 1. **Pull latest changes** before starting work:
    ```zsh
@@ -103,7 +100,5 @@ Read `Project-description.md` for the full project requirements, deadlines, and 
 
 3. **Push**
    ```zsh
-   git add .
-   git commit -m "Your commit message"
-   git push
+    just push
    ```
