@@ -1,0 +1,132 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.7"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "8789b60ffee84904883350e241160092",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "95e2931743eec9eee488c3df729c2bb7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><br><h1 style='text-align: center;'>Fake News</h1><br></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "c99bd88816480a4b8d4c00654a777b29",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "41c2ac19c978037e82c0146438646586",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "multiple-defs",
+          "evalue": "The variable 'df' was defined by another cell",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "e59862bd060558edfb65c39d205298c9",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "Name `df` is not defined. It was expected to be defined in ",
+          "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;C:\\Users\\dinne\\creative\\diku\\gds\\Fake-News-Project\\.venv\\Lib\\site-packages\\marimo\\_runtime\\executor.py&quot;</span>, line <span class=\"m\">139</span>, in <span class=\"n\">execute_cell</span>\n<span class=\"w\">    </span><span class=\"k\">return</span> <span class=\"nb\">eval</span><span class=\"p\">(</span><span class=\"n\">cell</span><span class=\"o\">.</span><span class=\"n\">last_expr</span><span class=\"p\">,</span> <span class=\"n\">glbls</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;C:\\Users\\dinne\\AppData\\Local\\Temp\\marimo_19036\\__marimo__cell_PKri_.py&quot;</span>, line <span class=\"m\">1</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">df</span><span class=\"o\">.</span><span class=\"n\">info</span><span class=\"p\">()</span>\n<span class=\"w\">    </span><span class=\"pm\">^^</span>\n<span class=\"gr\">NameError</span>: <span class=\"n\">name &#39;df&#39; is not defined</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "Xref",
+      "code_hash": "e145a66eac7dcff3dac05a1e19c30a71",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "multiple-defs",
+          "evalue": "The variable 'df' was defined by another cell",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
