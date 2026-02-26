@@ -28,9 +28,7 @@ def _():
 @app.cell
 def _():
     import polars as pl
-    import numpy as np
     import altair as alt
-    import nltk
     import re
 
     return alt, pl, re
@@ -113,19 +111,16 @@ def _(re):
             line = re.sub(date_ptn, "<DATE>", " ".join(line))
             line = re.sub(email_ptn, "<EMAIL>", line)
             line = re.sub(url_ptn, "<URL>", line)
-            line = (
-                re.sub(num_ptn, "<NUM>", line).split()
-            )  # <NUM> last because dates,emails, and urls may contain numbers
+            line = re.sub(
+                num_ptn, "<NUM>", line
+            ).split()  # <NUM> last because dates,emails, and urls may contain numbers
 
             # joining back and adding <OTHER> token
             # decided to keep word1-word2 as a new word
             line = " ".join(
                 [
                     x
-                    if x.replace("-", "")
-                    .replace("'", "")
-                    .replace("'", "")
-                    .isalpha()
+                    if x.replace("-", "").replace("'", "").replace("'", "").isalpha()
                     or x in special_tokens
                     else "<OTHER>"
                     for x in line
@@ -163,9 +158,7 @@ def _(clean_text, df, pl):
             for col in natural_language_cols
         ]
     )
-    df2.filter(pl.col("meta_keywords") != "nan").select(
-        natural_language_cols
-    ).head()
+    df2.filter(pl.col("meta_keywords") != "nan").select(natural_language_cols).head()
     return df2, natural_language_cols
 
 
@@ -177,14 +170,11 @@ def _(df2, natural_language_cols, pl):
     stop_words = list(set(stopwords.words("english")))
     stemmer = PorterStemmer()
 
-
     def remove_stopwords(text: str) -> str:
         return " ".join([w for w in text.split() if w not in stop_words])
 
-
     def stem_text(text: str) -> str:
         return " ".join([stemmer.stem(w) for w in text.split()])
-
 
     df3 = df2.with_columns(
         [

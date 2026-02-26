@@ -5,32 +5,6 @@
   },
   "cells": [
     {
-      "id": "MJUe",
-      "code_hash": "95e2931743eec9eee488c3df729c2bb7",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><br><h1 style='text-align: center;'>Fake News</h1><br></span></span>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "RGSE",
-      "code_hash": "f068e108f0dd90d6150c93566337ac65",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><br><br><br></span>\n<h1 style='text-align : center;'>CHECK OTHER</h1>\n<span class=\"paragraph\"><br><br><br></span></span>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
       "id": "Hbol",
       "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
       "outputs": [
@@ -38,6 +12,19 @@
           "type": "data",
           "data": {
             "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "95e2931743eec9eee488c3df729c2bb7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><br><h1 style='text-align: center;'>Fake News</h1><br></span></span>"
           }
         }
       ],
@@ -136,6 +123,19 @@
           "type": "data",
           "data": {
             "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "f068e108f0dd90d6150c93566337ac65",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><br><br><br></span>\n<h1 style='text-align : center;'>CHECK OTHER</h1>\n<span class=\"paragraph\"><br><br><br></span></span>"
           }
         }
       ],
