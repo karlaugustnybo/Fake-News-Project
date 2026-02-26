@@ -1,5 +1,3 @@
-set shell := ["powershell.exe", "-Command"]
-
 run:
     just check
     just format
