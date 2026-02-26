@@ -26,3 +26,6 @@ push:
 
 pull:
     git pull
+
+reset:
+    git reset --hard origin/main
