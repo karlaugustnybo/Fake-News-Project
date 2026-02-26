@@ -23,3 +23,6 @@ push:
     git add .
     git commit -m "Update"
     git push
+
+reset:
+    git reset --hard origin/main
