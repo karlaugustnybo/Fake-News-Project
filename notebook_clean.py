@@ -28,7 +28,7 @@ def _():
     import contractions
     from sklearn.feature_extraction.text import TfidfVectorizer
 
-    return TfidfVectorizer, alt, contractions, np, pl, re
+    return TfidfVectorizer, alt, contractions, np, pl
 
 
 @app.cell
@@ -60,20 +60,17 @@ def _(pl):
         c
         for c in [
             "id",
-            "domain",
             "Unnamed: 0",
             "url",
-            "scraped_at",
             "inserted_at",
             "updated_at",
             "keywords",
             "summary",
-            "tags",
             "source",
         ]
         if c in df_raw.columns
     ]
-    df_raw = df_raw.drop(drop_cols).head(100_000)
+    df_raw = df_raw.drop(drop_cols)#.head(10_000)
     df_raw
     return (df_raw,)
 
@@ -93,12 +90,9 @@ def _(df_raw, pl):
     n_before = df_raw.shape[0]
     df_deduped = df_raw.unique(subset=["content"])
     n_after = df_deduped.shape[0]
-    print(
-        f"Duplicates removed: {n_before - n_after} "
-        f"({n_before} -> {n_after})"
-    )
+    print(f"Duplicates removed: {n_before - n_after} ({n_before} -> {n_after})")
 
-    df = df_deduped.drop(["keywords", "summary"]).with_columns(
+    df = df_deduped.with_columns(
         pl.when(pl.col("meta_keywords") == "['']")
         .then(pl.lit(None))
         .otherwise(pl.col("meta_keywords"))
@@ -130,41 +124,33 @@ def _(df, pl):
 
 @app.cell
 def _(contractions):
-    c_patterns = [
-        k.lower() for k in contractions.contractions_dict.keys()
-    ]
-    c_replacements = [
-        v.lower() for v in contractions.contractions_dict.values()
-    ]
-    return c_patterns, c_replacements
+    c_patterns = [k.lower() for k in contractions.contractions_dict.keys()]
+    c_replacements = [v.lower() for v in contractions.contractions_dict.values()]
+    return
 
 
 @app.cell
-def _(c_patterns, c_replacements, df, pl):
+def _(df, pl):
     text_cols = ["content", "title", "meta_description"]
     other_cols = ["authors", "meta_keywords"]
 
     df_cleaned = df.with_columns(
         *[
             pl.col(col)
+            .str.replace_all(r"<[^>]+>", " ")
+            .str.replace_all(r"https?://\S+|www\.\S+", "")
+            .str.replace_all(r"[\u2018\u2019\u201C\u201D]", "'")
             .str.to_lowercase()
-            .str.replace_many(c_patterns, c_replacements)
             .str.strip_chars()
             .alias(col)
             for col in text_cols
         ],
-        *[
-            pl.col(col)
-            .str.to_lowercase()
-            .str.strip_chars()
-            .alias(col)
-            for col in other_cols
-        ],
+    ).filter(
+        pl.col("content").is_not_null() & (pl.col("content").str.len_chars() > 0)
     )
 
     df_cleaned = df_cleaned.filter(
-        pl.col("content").is_not_null()
-        & (pl.col("content").str.len_chars() > 0)
+        pl.col("content").is_not_null() & (pl.col("content").str.len_chars() > 0)
     )
 
     df_cleaned.filter(pl.col("meta_keywords").is_not_null()).select(
@@ -174,46 +160,63 @@ def _(c_patterns, c_replacements, df, pl):
 
 
 @app.cell
-def _(TfidfVectorizer, df_cleaned, re):
-    # TODO: This currently fits TF-IDF on the full dataset. Before modeling,
-    # split into train/test first, then fit_transform on train and transform
-    # on test to avoid data leakage through IDF weights.
+def _(df_cleaned, np):
+    from sklearn.model_selection import train_test_split
 
-    _url_pattern = re.compile(r"https?://\S+|www\.\S+")
-    _token_pattern = re.compile(r"[a-zA-Z]{2,}")
+    n = df_cleaned.shape[0]
+    indices = np.arange(n)
 
-    def custom_tokenizer(text: str) -> list[str]:
-        text = _url_pattern.sub("", text)
-        return _token_pattern.findall(text)
+    train_idx, temp_idx = train_test_split(
+        indices, test_size=0.2, random_state=42
+    )
+    val_idx, test_idx = train_test_split(
+        temp_idx, test_size=0.5, random_state=42
+    )
 
+    df_train = df_cleaned[train_idx.tolist()]
+    df_val = df_cleaned[val_idx.tolist()]
+    df_test = df_cleaned[test_idx.tolist()]
+
+    print(f"Train: {df_train.shape[0]}  ({df_train.shape[0]/n:.0%})")
+    print(f"Val:   {df_val.shape[0]}  ({df_val.shape[0]/n:.0%})")
+    print(f"Test:  {df_test.shape[0]}  ({df_test.shape[0]/n:.0%})")
+    return df_test, df_train, df_val
+
+
+@app.cell
+def _(TfidfVectorizer, df_test, df_train, df_val):
     vectorizer = TfidfVectorizer(
         max_features=50_000,
         min_df=5,
         max_df=0.95,
         stop_words="english",
-        tokenizer=custom_tokenizer,
-        token_pattern=None,
+        token_pattern=r"[a-zA-Z]{2,}",
     )
 
-    content = df_cleaned["content"].to_list()
-    tfidf_matrix = vectorizer.fit_transform(content)
+    tfidf_train = vectorizer.fit_transform(df_train["content"].to_list())
+    tfidf_val = vectorizer.transform(df_val["content"].to_list())
+    tfidf_test = vectorizer.transform(df_test["content"].to_list())
 
     print(f"Vocabulary size: {len(vectorizer.vocabulary_)}")
-    print(f"TF-IDF shape:    {tfidf_matrix.shape}")
-    return tfidf_matrix, vectorizer
+    print(f"TF-IDF train: {tfidf_train.shape}")
+    print(f"TF-IDF val:   {tfidf_val.shape}")
+    print(f"TF-IDF test:  {tfidf_test.shape}")
+    return tfidf_train, vectorizer
 
 
 @app.cell
-def _(alt, np, pl, tfidf_matrix, vectorizer):
+def _(alt, np, pl, tfidf_train, vectorizer):
     # Sum TF-IDF scores per term across all documents.
-    tfidf_sums = np.asarray(tfidf_matrix.sum(axis=0)).flatten()
+    tfidf_sums = np.asarray(tfidf_train.sum(axis=0)).flatten()
     feature_names = vectorizer.get_feature_names_out()
 
     vocab = (
-        pl.DataFrame({
-            "word": feature_names,
-            "tfidf_sum": tfidf_sums,
-        })
+        pl.DataFrame(
+            {
+                "word": feature_names,
+                "tfidf_sum": tfidf_sums,
+            }
+        )
         .sort("tfidf_sum", descending=True)
         .head(50)
     )
