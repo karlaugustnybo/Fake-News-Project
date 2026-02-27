@@ -25,16 +25,16 @@ def _():
     import altair as alt
     import numpy as np
     import re
-    import contractions
     from sklearn.feature_extraction.text import TfidfVectorizer
 
-    return TfidfVectorizer, alt, contractions, np, pl
+    return TfidfVectorizer, alt, np, pl
 
 
 @app.cell
 def _(pl):
     filepath = "news/data/995,000_rows.csv"
 
+    # Force all columns to string so Polars doesn't mis-infer types
     schema = {
         "type": pl.Utf8,
         "url": pl.Utf8,
@@ -56,6 +56,8 @@ def _(pl):
     }
 
     df_raw = pl.read_csv(filepath, schema_overrides=schema)
+
+    # Drop columns irrelevant to fake-news classification
     drop_cols = [
         c
         for c in [
@@ -123,13 +125,6 @@ def _(df, pl):
 
 
 @app.cell
-def _(contractions):
-    c_patterns = [k.lower() for k in contractions.contractions_dict.keys()]
-    c_replacements = [v.lower() for v in contractions.contractions_dict.values()]
-    return
-
-
-@app.cell
 def _(df, pl):
     text_cols = ["content", "title", "meta_description"]
     other_cols = ["authors", "meta_keywords"]
@@ -137,9 +132,9 @@ def _(df, pl):
     df_cleaned = df.with_columns(
         *[
             pl.col(col)
-            .str.replace_all(r"<[^>]+>", " ")
-            .str.replace_all(r"https?://\S+|www\.\S+", "")
-            .str.replace_all(r"[\u2018\u2019\u201C\u201D]", "'")
+            .str.replace_all(r"<[^>]+>", " ")          # strip HTML
+            .str.replace_all(r"https?://\S+|www\.\S+", "")  # remove URLs
+            .str.replace_all(r"[\u2018\u2019\u201C\u201D]", "'")  # normalise quotes
             .str.to_lowercase()
             .str.strip_chars()
             .alias(col)
@@ -149,10 +144,12 @@ def _(df, pl):
         pl.col("content").is_not_null() & (pl.col("content").str.len_chars() > 0)
     )
 
+    # Second pass filter (safety net) to ensure no empty content slips through
     df_cleaned = df_cleaned.filter(
         pl.col("content").is_not_null() & (pl.col("content").str.len_chars() > 0)
     )
 
+    # Preview rows that have meta_keywords for a quick sanity check
     df_cleaned.filter(pl.col("meta_keywords").is_not_null()).select(
         text_cols + other_cols
     ).head()
@@ -193,6 +190,7 @@ def _(TfidfVectorizer, df_test, df_train, df_val):
         token_pattern=r"[a-zA-Z]{2,}",
     )
 
+    # fit on train, transform all three splits
     tfidf_train = vectorizer.fit_transform(df_train["content"].to_list())
     tfidf_val = vectorizer.transform(df_val["content"].to_list())
     tfidf_test = vectorizer.transform(df_test["content"].to_list())
@@ -206,10 +204,11 @@ def _(TfidfVectorizer, df_test, df_train, df_val):
 
 @app.cell
 def _(alt, np, pl, tfidf_train, vectorizer):
-    # Sum TF-IDF scores per term across all documents.
+    # Sum TF-IDF scores per term across all training documents
     tfidf_sums = np.asarray(tfidf_train.sum(axis=0)).flatten()
     feature_names = vectorizer.get_feature_names_out()
 
+    # Build a small DataFrame of the top 50 terms for plotting
     vocab = (
         pl.DataFrame(
             {
