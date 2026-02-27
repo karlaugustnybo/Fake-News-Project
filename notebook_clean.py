@@ -35,11 +35,45 @@ def _():
 def _(pl):
     filepath = "news/data/995,000_rows.csv"
 
-    df_raw = pl.read_csv(filepath, infer_schema_length=None)
+    schema = {
+        "type": pl.Utf8,
+        "url": pl.Utf8,
+        "content": pl.Utf8,
+        "scraped_at": pl.Utf8,
+        "inserted_at": pl.Utf8,
+        "updated_at": pl.Utf8,
+        "title": pl.Utf8,
+        "authors": pl.Utf8,
+        "keywords": pl.Utf8,
+        "meta_keywords": pl.Utf8,
+        "meta_description": pl.Utf8,
+        "tags": pl.Utf8,
+        "summary": pl.Utf8,
+        "source": pl.Utf8,
+        "id": pl.Utf8,
+        "domain": pl.Utf8,
+        "Unnamed: 0": pl.Utf8,
+    }
+
+    df_raw = pl.read_csv(filepath, schema_overrides=schema)
     drop_cols = [
-        c for c in ["id", "domain", "Unnamed: 0"] if c in df_raw.columns
+        c
+        for c in [
+            "id",
+            "domain",
+            "Unnamed: 0",
+            "url",
+            "scraped_at",
+            "inserted_at",
+            "updated_at",
+            "keywords",
+            "summary",
+            "tags",
+            "source",
+        ]
+        if c in df_raw.columns
     ]
-    df_raw = df_raw.drop(drop_cols)
+    df_raw = df_raw.drop(drop_cols).head(100_000)
     df_raw
     return (df_raw,)
 
