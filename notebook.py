@@ -71,114 +71,241 @@ def _(df, pl):
 
 @app.cell
 def _(re):
-    _DATE_PTN = re.compile(
+    CONTRACTIONS = {
+        "didn't": "did not",
+        "don't": "do not",
+        "won't": "will not",
+        "can't": "cannot",
+        "isn't": "is not",
+        "wasn't": "was not",
+        "aren't": "are not",
+        "weren't": "were not",
+        "hasn't": "has not",
+        "haven't": "have not",
+        "couldn't": "could not",
+        "wouldn't": "would not",
+        "shouldn't": "should not",
+        "it's": "it is",
+        "he's": "he is",
+        "she's": "she is",
+        "that's": "that is",
+        "there's": "there is",
+        "we'll": "we will",
+        "they'll": "they will",
+        "i'll": "i will",
+        "you'll": "you will",
+        "i'm": "i am",
+        "you're": "you are",
+        "we're": "we are",
+        "they're": "they are",
+        "i've": "i have",
+        "you've": "you have",
+        "we've": "we have",
+        "they've": "they have",
+        "let's": "let us",
+        "who's": "who is",
+        "what's": "what is",
+        "here's": "here is",
+        "how's": "how is",
+        "where's": "where is",
+    }
+
+    CONTRACTION_PTN = re.compile(
+        r"\b(" + "|".join(re.escape(k) for k in CONTRACTIONS) + r")\b",
+        re.IGNORECASE,
+    )
+
+    ABBREVIATIONS = {
+        "u.s.": "united states",
+        "u.k.": "united kingdom",
+        "u.n.": "united nations",
+        "e.u.": "european union",
+        "d.c.": "district of columbia",
+        "p.o.": "post office",
+    }
+
+    ABBREVIATION_PTN = re.compile(
+        r"\b(" + "|".join(re.escape(k) for k in ABBREVIATIONS) + r")\b",
+        re.IGNORECASE,
+    )
+
+    POSSESSIVE_PTN = re.compile(r"'s\b")
+    DASH_SPLIT_RE = re.compile(r"[\u2013\u2014]+")
+
+    URL_PTN = re.compile(
+        r"https?://[^\s]+"
+        r"|www\.[^\s]+"
+        r"|pic\.twitter\.com/[^\s]+"
+    )
+    EMAIL_PTN = re.compile(
+        r"[^\s\n:;,.]+@[a-z0-9.]+\.[^\s\n:;,.]+", re.IGNORECASE
+    )
+    MONEY_PTN = re.compile(r"[\$\u00a3\u20ac]\s?\d[\d,]*\.?\d*")
+    DATE_PTN = re.compile(
         r"\b\d{1,2}[/ -]\d{1,2}[/ -]\d{2,4}\b"
         r"|\b\d{4}[/ -]\d{1,2}[/ -]\d{1,2}\b"
     )
-    _EMAIL_PTN = re.compile(r"[^\s\n:;,.]+@[a-z0-9.]+\.[^\s\n:;,.]+")
-    _URL_PTN = re.compile(r"https?://[^\s]+|www\.[^\s]+")
-    _NUM_PTN = re.compile(r"\b\d[\d,]*\.?\d*\b")
-    _PUNCT_RE = re.compile(r"[^\w\s<>-]")
-    _MULTI_NEWLINE_RE = re.compile(r"\n{2,}")
+    ORDINAL_PTN = re.compile(r"\b\d+(st|nd|rd|th)\b", re.IGNORECASE)
 
-    _SPECIAL_TOKENS = {"<NUM>", "<DATE>", "<EMAIL>", "<URL>", "<OTHER>"}
+    NUM_PTN = re.compile(r"\b\d[\d,]*\.?\d*\b")
+    # No longer preserve < > in general text
+    PUNCT_RE = re.compile(r"[^\w\s-]")
+    MULTI_NEWLINE_RE = re.compile(r"\n{2,}")
+    SINGLE_CHAR_RE = re.compile(r"\b\w\b")
 
-    SINGLE_CHAR_PATTERN = r"\b\w\b"
+    # Pattern for mixed alphanumeric tokens like co2, mi6, l2tp
+    ALNUM_RE = re.compile(r"^[a-z]+\d+[a-z0-9]*$|^\d+[a-z]+[a-z0-9]*$")
+
+    SPECIAL_TOKENS = {
+        "<NUM>",
+        "<DATE>",
+        "<EMAIL>",
+        "<URL>",
+        "<MONEY>",
+        "<OTHER>",
+    }
+
+    other_log_list: list[str] = []
+
+    def _expand_contraction(match: re.Match) -> str:
+        word = match.group(0).lower()
+        replacement = CONTRACTIONS[word]
+        if match.group(0)[0].isupper():
+            return replacement.capitalize()
+        return replacement
+
+    def _expand_abbreviation(match: re.Match) -> str:
+        return ABBREVIATIONS[match.group(0).lower()]
+
+    def _pad_special_token(pattern, replacement, text):
+        """Replace pattern and ensure whitespace around the token."""
+        def _repl(m):
+            return f" {replacement} "
+        return pattern.sub(_repl, text)
+
+    def _expand_hyphenated(token: str) -> list[str]:
+        parts = token.split("-")
+        # If every non-empty part is purely alphabetic, keep as-is
+        if all(p.isalpha() for p in parts if p):
+            return [token]
+
+        out = []
+        for p in parts:
+            if not p:
+                continue
+            if p in SPECIAL_TOKENS:
+                out.append(p)
+            elif p == "<num>":
+                # Recover lowercased <NUM>
+                out.append("<NUM>")
+            elif p.isdigit() or NUM_PTN.fullmatch(p):
+                out.append("<NUM>")
+            elif p.isalpha():
+                out.append(p)
+            elif ALNUM_RE.match(p):
+                # Keep well-known alphanumeric identifiers intact
+                out.append(p)
+            else:
+                m = re.match(r"(\d+)([a-zA-Z]+)", p)
+                if m:
+                    out.append("<NUM>")
+                    out.append(m.group(2))
+                else:
+                    other_log_list.append(token)
+                    out.append("<OTHER>")
+        return out if out else ["<OTHER>"]
+
+    def _classify_token(t: str) -> str:
+        """Classify a single post-cleanup token."""
+        if t in SPECIAL_TOKENS:
+            return t
+        if t.replace("-", "").isalpha():
+            return t
+        if ALNUM_RE.match(t):
+            # Alphanumeric identifiers: co2, mi6, l2tp, cas9, h1, etc.
+            return t
+        if "-" in t:
+            return None  # signal: needs hyphen expansion
+        if NUM_PTN.fullmatch(t):
+            return "<NUM>"
+        # Last resort: try splitting leading digits from trailing alpha
+        m = re.match(r"^(\d+)([a-zA-Z]+)$", t)
+        if m:
+            return None  # signal: needs splitting
+        other_log_list.append(t)
+        return "<OTHER>"
 
     def clean_text(doc: str) -> str:
-        """Clean a document string and replace entities with special tokens.
-
-        Token contract
-        --------------
-        <DATE>   - date-like patterns  (e.g. 01/02/2024, 2024-01-02)
-        <EMAIL>  - email addresses
-        <URL>    - http(s) / www URLs
-        <NUM>    - standalone numbers (applied last so dates/emails/URLs
-                   are already replaced)
-        <OTHER>  - any remaining non-alphabetic, non-special token
-        """
         lines = doc.split("\n")
         out = []
 
         for line in lines:
+            # 1. Expand contractions
+            line = CONTRACTION_PTN.sub(_expand_contraction, line)
+
+            # 2. Strip possessives
+            line = POSSESSIVE_PTN.sub("", line)
+
+            # 3. Split em/en dashes
+            line = DASH_SPLIT_RE.sub(" ", line)
+
+            # 4. Replace entities with padded special tokens
+            line = _pad_special_token(URL_PTN, "<URL>", line)
+            line = _pad_special_token(EMAIL_PTN, "<EMAIL>", line)
+            line = _pad_special_token(MONEY_PTN, "<MONEY>", line)
+            line = _pad_special_token(DATE_PTN, "<DATE>", line)
+            line = ORDINAL_PTN.sub(" <NUM> ", line)
+
+            # 5. Replace abbreviations
+            line = ABBREVIATION_PTN.sub(_expand_abbreviation, line)
+
+            # 6. Strip punctuation (now removes < > too) and lowercase
             tokens = line.split()
-            tokens = [_PUNCT_RE.sub("", t).lower() for t in tokens]
-            tokens = [t for t in tokens if len(t) > 0]
-
-            joined = " ".join(tokens)
-
-            joined = _DATE_PTN.sub("<DATE>", joined)
-            joined = _EMAIL_PTN.sub("<EMAIL>", joined)
-            joined = _URL_PTN.sub("<URL>", joined)
-            joined = _NUM_PTN.sub("<NUM>", joined)
-
-            final_tokens = []
-            for t in joined.split():
-                if t in _SPECIAL_TOKENS:
-                    final_tokens.append(t)
-                elif t.replace("-", "").isalpha():
-                    final_tokens.append(t)
+            clean_tokens = []
+            for t in tokens:
+                if t in SPECIAL_TOKENS:
+                    clean_tokens.append(t)
                 else:
-                    final_tokens.append("<OTHER>")
+                    cleaned = PUNCT_RE.sub("", t).lower().strip("-")
+                    if cleaned:
+                        clean_tokens.append(cleaned)
+            tokens = clean_tokens
+
+            # 7. Replace bare numbers
+            joined = " ".join(tokens)
+            joined = NUM_PTN.sub("<NUM>", joined)
+            tokens = joined.split()
+
+            # 8. Classify and expand each token
+            final_tokens = []
+            for t in tokens:
+                label = _classify_token(t)
+                if label is not None:
+                    final_tokens.append(label)
+                elif "-" in t:
+                    final_tokens.extend(_expand_hyphenated(t))
+                else:
+                    # digit+alpha glued tokens like "tonnes17"
+                    m = re.match(r"^(\d+)([a-zA-Z]+)$", t)
+                    if m:
+                        final_tokens.append("<NUM>")
+                        final_tokens.append(m.group(2))
+                    else:
+                        m2 = re.match(r"^([a-zA-Z]+)(\d+)$", t)
+                        if m2:
+                            final_tokens.append(m2.group(1))
+                            final_tokens.append("<NUM>")
+                        else:
+                            other_log_list.append(t)
+                            final_tokens.append("<OTHER>")
 
             out.append(" ".join(final_tokens))
 
         result = "\n".join(out)
-        result = _MULTI_NEWLINE_RE.sub("\n", result)
+        result = MULTI_NEWLINE_RE.sub("\n", result)
         return result
 
-    return SINGLE_CHAR_PATTERN, clean_text
-
-
-@app.cell
-def _(df, df2, pl):
-    """Show the original tokens that got replaced by <OTHER>."""
-    from collections import Counter
-
-    other_counter = Counter()
-
-    raw_texts = df["content"].drop_nulls().head(500).to_list()
-    clean_texts = df2["content"].drop_nulls().head(500).to_list()
-
-    for raw, cleaned in zip(raw_texts, clean_texts):
-        raw_lines = raw.split("\n")
-        clean_lines = cleaned.split("\n")
-
-        for raw_line, clean_line in zip(raw_lines, clean_lines):
-            raw_tokens = raw_line.split()
-            clean_tokens = clean_line.split()
-
-            if len(raw_tokens) != len(clean_tokens):
-                continue
-
-            for original, replaced in zip(raw_tokens, clean_tokens):
-                if replaced == "<OTHER>":
-                    other_counter[original] += 1
-
-    other_log = (
-        pl.DataFrame(
-            {
-                "original_token": list(other_counter.keys()),
-                "count": list(other_counter.values()),
-            }
-        )
-        .sort("count", descending=True)
-        .head(60)
-    )
-
-    print(f"Unique tokens mapped to <OTHER>: {other_log.height}")
-    other_log
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <br><br><br>
-    <h1 style='text-align : center;'>CHECK OTHER</h1>
-    <br><br><br>
-    """)
-    return
+    return SINGLE_CHAR_RE, SPECIAL_TOKENS, clean_text, other_log_list
 
 
 @app.cell
@@ -212,7 +339,25 @@ def _(clean_text, df, pl):
 
 
 @app.cell
-def _(SINGLE_CHAR_PATTERN, df2, natural_language_cols, pl):
+def _(other_log_list: list[str], pl):
+    from collections import Counter
+
+    other_counter = Counter(other_log_list)
+    other_log = (
+        pl.DataFrame(
+            {
+                "original_token": list(other_counter.keys()),
+                "count": list(other_counter.values()),
+            }
+        )
+        .sort("count", descending=True)
+    )
+    other_log
+    return
+
+
+@app.cell
+def _(SINGLE_CHAR_RE, SPECIAL_TOKENS, df2, natural_language_cols, pl):
     from nltk.corpus import stopwords
     from nltk.stem import PorterStemmer
 
@@ -222,13 +367,18 @@ def _(SINGLE_CHAR_PATTERN, df2, natural_language_cols, pl):
         stemmer.stem(w) for w in stopwords.words("english")
     )
 
+
     def remove_stopwords_and_stem(text: str) -> str:
-        """Stem every token and drop stemmed stopwords in one pass."""
-        return " ".join(
-            stemmer.stem(w)
-            for w in text.split()
-            if stemmer.stem(w) not in stemmed_stop_words
-        )
+        tokens = []
+        for w in text.split():
+            if w in SPECIAL_TOKENS:
+                tokens.append(w)
+                continue
+            s = stemmer.stem(w)
+            if s not in stemmed_stop_words:
+                tokens.append(s)
+        return " ".join(tokens)
+
 
     _new_columns = {}
     for _col in natural_language_cols:
@@ -248,7 +398,7 @@ def _(SINGLE_CHAR_PATTERN, df2, natural_language_cols, pl):
     df3 = df3.with_columns(
         [
             pl.col(_col)
-            .str.replace_all(SINGLE_CHAR_PATTERN, "")
+            .str.replace_all(SINGLE_CHAR_RE.pattern, "")
             .str.replace_all(r" {2,}", " ")
             .str.strip_chars(" ")
             .alias(_col)
@@ -280,7 +430,9 @@ def _(alt, df3, natural_language_cols, pl):
         alt.Chart(vocab)
         .mark_line(point=True)
         .encode(
-            x=alt.X("word:N", sort=None, axis=alt.Axis(labelAngle=-35)),
+            x=alt.X(
+                "word:N", sort=None, axis=alt.Axis(labelAngle=-35)
+            ),
             y=alt.Y("count:Q"),
         )
         .properties(width=900, height=300)
