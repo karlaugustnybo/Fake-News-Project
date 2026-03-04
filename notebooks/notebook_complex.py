@@ -510,7 +510,7 @@ def _(df_filtered, np, pl):
 
     _n_outlier_rm = int((~_outlier_mask).sum())
     _n_label_rm = int((~_label_mask & _outlier_mask).sum())
-    print(f"\n── Cleanlab-based removal ──")
+    print("\n── Cleanlab-based removal ──")
     print(f"Severe outliers removed (score < 0.01): {_n_outlier_rm}")
     print(f"Mislabeled samples removed (score < 0.15): {_n_label_rm}")
     print(f"Rows remaining: {df_audited.shape[0]}  (was {_n_before})")
@@ -626,7 +626,7 @@ def _(TfidfVectorizer, df_test, df_train, df_val, np):
     print(f"TF-IDF train: {tfidf_train.shape}")
     print(f"TF-IDF val:   {tfidf_val.shape}")
     print(f"TF-IDF test:  {tfidf_test.shape}")
-    print(f"\nFinal feature matrix shapes:")
+    print("\nFinal feature matrix shapes:")
     print(
         f"  X_train: {X_train.shape}  (TF-IDF: {tfidf_train.shape[1]} + style: {len(STYLE_COLS)})"
     )
