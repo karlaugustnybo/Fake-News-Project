@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "altair>=6.0.0",
+    "cleanlab[datalab]>=2.6.0",
+    "datasketch>=1.6.0",
+    "langdetect>=1.0.9",
     "contractions>=0.1.73",
     "duckdb>=1.4.4",
     "jupyter>=1.1.1",
@@ -26,6 +29,7 @@ dependencies = [
     "torch>=2.10.0",
     "vegafusion>=2.0.3",
     "vl-convert-python>=1.9.0.post1",
+    "pandarallel>=1.6.5",
 ]
 
 [dependency-groups]

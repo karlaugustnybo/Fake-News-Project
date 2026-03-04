@@ -29,3 +29,7 @@ pull:
 
 reset:
     git reset --hard origin/main
+
+upgrade:
+    uv lock --upgrade
+    uv sync

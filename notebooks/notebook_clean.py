@@ -1,20 +1,19 @@
 import marimo
 
-__generated_with = "0.20.2"
+__generated_with = "0.19.2"
 app = marimo.App(sql_output="lazy-polars")
 
 
 @app.cell
 def _():
     import marimo as mo
-
     return (mo,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    <br><h1 style='text-align: center;'>Fake News</h1><br>
+    <br><h1 style='text-align: center;'>Fake News Clean</h1><br>
     """)
     return
 
@@ -26,7 +25,6 @@ def _():
     import numpy as np
     import re
     from sklearn.feature_extraction.text import TfidfVectorizer
-
     return TfidfVectorizer, alt, np, pl
 
 

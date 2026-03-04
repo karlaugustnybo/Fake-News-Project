@@ -1,20 +1,19 @@
 import marimo
 
-__generated_with = "0.20.2"
+__generated_with = "0.19.2"
 app = marimo.App(sql_output="lazy-polars")
 
 
 @app.cell
 def _():
     import marimo as mo
-
     return (mo,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    <br><h1 style='text-align: center;'>Fake News</h1><br>
+    <br><h1 style='text-align: center;'>Fake News Standard</h1><br>
     """)
     return
 
@@ -24,7 +23,6 @@ def _():
     import polars as pl
     import altair as alt
     import re
-
     return alt, pl, re
 
 
@@ -304,7 +302,6 @@ def _(re):
         result = "\n".join(out)
         result = MULTI_NEWLINE_RE.sub("\n", result)
         return result
-
     return SINGLE_CHAR_RE, SPECIAL_TOKENS, clean_text, other_log_list
 
 
