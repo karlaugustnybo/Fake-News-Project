@@ -4,13 +4,6 @@ __generated_with = "0.20.4"
 app = marimo.App()
 
 
-@app.cell
-def _():
-    import marimo as mo
-
-    return (mo,)
-
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -380,8 +373,9 @@ def _(
 
 
 @app.cell
-def _(pl):
-    df_final = pl.read_csv("news/data/995,000_rows_preprocessed.csv")
+def _():
+    import pandas as pd
+    df_final = pd.read_csv("news/data/995,000_rows_preprocessed.csv")
     df_final
     return
 
