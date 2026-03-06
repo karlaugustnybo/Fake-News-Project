@@ -53,18 +53,6 @@ Fake-News-Project/
 └── uv.lock                 # Lockfile for reproducible installs
 ```
 
----
-
-## Key Technologies
-
-| Tool / Library     | Purpose                                      |
-|-------------------|---------------------------------------------|
-| **Polars**        | Fast DataFrame library (like Pandas)        |
-| **Altair**        | Declarative data visualization              |
-| **scikit-learn**  | Machine learning models                     |
-| **PyTorch**       | Deep learning framework                     |
-| **Marimo**        | Reactive Python notebooks                   |
-| **Rich**          | Pretty terminal output                      |
 
 ---
 
