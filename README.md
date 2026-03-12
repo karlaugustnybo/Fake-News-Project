@@ -40,15 +40,24 @@ Use `just` to run common commands:
 
 ```
 Fake-News-Project/
-├── main.py                 # Entry point – start coding here!
-├── pyproject.toml          # Project config & dependencies
-├── Justfile                # Task runner commands
-├── Project-description.md  # Full assignment description
-├── README.md               # This file
-├── .python-version         # Specifies Python 3.14
-├── .gitignore              # Ignores venv, caches, etc.
-├── .venv/                  # Virtual environment (auto-created)
-└── uv.lock                 # Lockfile for reproducible installs
+├── news/                        # Main analysis directory
+│   ├── data/                    # Datasets (git-ignored large files)
+│   │   ├── 995,000_rows.csv
+│   │   ├── 995,000_rows_preprocessed.csv
+│   │   └── news_sample.csv
+│   ├── news_1_pl.ipynb          
+│   ├── news_part_1__2.ipynb     
+│   ├── news_part_2__1.ipynb     
+│   ├── news_part_3.ipynb        
+│   └── bert__1.ipynb            
+├── pyproject.toml               # Project config & dependencies
+├── Justfile                     # Task runner commands
+├── Project-description.md       # Full assignment description
+├── README.md                    
+├── .python-version              # Specifies Python 3.14
+├── .gitignore                   # Ignores venv, caches, etc.
+├── .venv/                       # Virtual environment (auto-created)
+└── uv.lock                      # Lockfile for reproducible installs
 ```
 
 
@@ -67,24 +76,3 @@ Run `just format` before committing to keep the code clean!
 ## Assignment Details
 
 Read `Project-description.md` for the full project requirements, deadlines, and deliverables.
-
----
-
-## Team Workflow
-
-1. **Pull latest changes** before starting work:
-   ```zsh
-   git pull
-   ```
-
-2. **Format & test** before pushing:
-   ```zsh
-   just format
-   just check
-   just test
-   ```
-
-3. **Push**
-   ```zsh
-    just push
-   ```
