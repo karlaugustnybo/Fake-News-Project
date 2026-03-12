@@ -1,12 +1,13 @@
 import marimo
 
-__generated_with = "0.19.2"
+__generated_with = "0.20.3"
 app = marimo.App(sql_output="lazy-polars")
 
 
 @app.cell
 def _():
     import marimo as mo
+
     return (mo,)
 
 
@@ -42,6 +43,7 @@ def _():
     from sklearn.feature_extraction.text import (
         TfidfVectorizer,
     )  # Text → TF-IDF features
+
     return TfidfVectorizer, alt, np, pl
 
 
