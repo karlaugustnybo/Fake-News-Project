@@ -11,7 +11,7 @@
 
 1. **Clone the repository** (if you haven't already):
    ```zsh
-   git clone <repo-url>
+   git clone <https://github.com/karlaugustnybo/Fake-News-Project.git>
    cd Fake-News-Project
    ```
 
