@@ -29,8 +29,6 @@ Use `just` to run common commands:
 
 | Command            | What it does                                       |
 |--------------------|---------------------------------------------------|
-| `just run`         | Runs `main.py` after type-checking and formatting |
-| `just notebook`    | Opens an interactive [Marimo](https://marimo.io/) notebook |
 | `just check`       | Type-check the codebase with [ty](https://docs.astral.sh/ty/) |
 | `just format`      | Lint & format code with [Ruff](https://docs.astral.sh/ruff/) |
 | `just test`        | Run tests with pytest                             |
