@@ -1,4 +1,4 @@
-LinearSVC, TF-IDF, 100K features, full dataset, 1-2 ngrams, real = reliable, fake = everything else
+SolVeig-Marie, LinearSVC, TF-IDF, 100K features, full dataset, 1-2 ngrams, real = reliable, fake = everything else
 
 shape: (8, 3)
 ┌──────────┬──────────────┬──────────┐

@@ -12,3 +12,15 @@ F1: 0.9795
     accuracy                           0.97     90368
    macro avg       0.95      0.96      0.96     90368
 weighted avg       0.97      0.97      0.97     90368
+
+Tested again later using saved joblib file.
+Accuracy: 0.9695
+F1: 0.9798
+              precision    recall  f1-score   support
+
+        real       0.93      0.95      0.94     21856
+        fake       0.98      0.98      0.98     68512
+
+    accuracy                           0.97     90368
+   macro avg       0.96      0.96      0.96     90368
+weighted avg       0.97      0.97      0.97     90368
