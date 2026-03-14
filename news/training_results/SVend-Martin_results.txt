@@ -1,0 +1,14 @@
+Svend-Martin, LinearSVC, TF-IDF, 100K features, full dataset, 1-2 ngrams, real = reliable, fake = everything else, class_weight="balanced"
+
+Best C: 0.3727593720314942
+Validation:
+Accuracy: 0.9690
+F1: 0.9795
+              precision    recall  f1-score   support
+
+        real       0.93      0.95      0.94     21856
+        fake       0.98      0.98      0.98     68512
+
+    accuracy                           0.97     90368
+   macro avg       0.95      0.96      0.96     90368
+weighted avg       0.97      0.97      0.97     90368
