@@ -5,8 +5,8 @@ import polars as pl
 from sklearn.model_selection import train_test_split
 
 
-PART3_REAL_LABELS = ["reliable"]
-PART3_DROP_LABELS = ["unknown", "nan", "2018-02-10 13:43:39.521661"]
+REAL_LABELS = ["reliable"]
+DROP_LABELS = ["unknown", "nan", "2018-02-10 13:43:39.521661"]
 
 
 def standard_labels(
@@ -15,8 +15,8 @@ def standard_labels(
     real_labels: list[str] | None = None,
     drop_labels: list[str] | None = None,
 ) -> pl.DataFrame:
-    real_labels = real_labels or PART3_REAL_LABELS
-    drop_labels = drop_labels or PART3_DROP_LABELS
+    real_labels = real_labels or REAL_LABELS
+    drop_labels = drop_labels or DROP_LABELS
 
     return df.filter(~pl.col(type_column).is_in(drop_labels)).with_columns(
         pl.when(pl.col(type_column).is_in(real_labels))
