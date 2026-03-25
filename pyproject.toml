@@ -1,0 +1,29 @@
+[project]
+name = "fake-news-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "nltk>=3.9.3",
+    "numpy>=2.4.2",
+    "pandas>=3.0.1",
+    "pandarallel>=1.6.5",
+    "polars[pyarrow]>=1.37.1",
+    "pystemmer>=3.0.0",
+    "scikit-learn>=1.8.0",
+    "torch>=2.10.0",
+    "transformers>=4.51.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "python-lsp-ruff>=2.3.0",
+    "python-lsp-server>=1.14.0",
+    "ruff>=0.15.0",
+    "ty>=0.0.14",
+    "websockets>=15.0.1",
+]
