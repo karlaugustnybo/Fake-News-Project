@@ -164,6 +164,25 @@ def preprocess_chunk(chunk: pl.DataFrame) -> pl.DataFrame:
     )
     return chunk
 
+schema = {
+    "type": pl.String,
+    "url": pl.String,
+    "content": pl.String,
+    "scraped_at": pl.String,
+    "inserted_at": pl.String,
+    "updated_at": pl.String,
+    "title": pl.String,
+    "authors": pl.String,
+    "keywords": pl.String,
+    "meta_keywords": pl.String,
+    "meta_description": pl.String,
+    "tags": pl.String,
+    "summary": pl.String,
+    "source": pl.String,
+    "id": pl.String,
+    "domain": pl.String,
+    "Unnamed: 0": pl.String,
+}
 
 def preprocess_file(
     filepath: str,
@@ -180,7 +199,7 @@ def preprocess_file(
         filepath,
         infer_schema_length=10000,
         truncate_ragged_lines=True,
-        schema_overrides={"Unnamed: 0": pl.String},
+        schema_overrides=schema,
     )
     total_rows = lf.select(pl.len()).collect().item()
     n_chunks = (total_rows + chunk_size - 1) // chunk_size
