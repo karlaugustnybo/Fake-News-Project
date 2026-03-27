@@ -5,7 +5,6 @@
 ### Prerequisites
 - **Python 3.14+** (managed via `.python-version`)
 - **[uv](https://docs.astral.sh/uv/)** – A fast Python package manager
-- **[just](https://github.com/casey/just)** – A command runner (like `make`)
 
 ### Setup (First Time)
 
@@ -25,14 +24,7 @@
 
 ## Running the Project
 
-Use `just` to run common commands:
-
-| Command            | What it does                                       |
-|--------------------|---------------------------------------------------|
-| `just check`       | Type-check the codebase with [ty](https://docs.astral.sh/ty/) |
-| `just format`      | Lint & format code with [Ruff](https://docs.astral.sh/ruff/) |
-| `just test`        | Run tests with pytest                             |
-| `just clean`       | Delete cache folders                              |
+There are five jupyter notebooks in the `news/` directory that contain the analysis and models etc.
 
 ---
 
@@ -40,39 +32,35 @@ Use `just` to run common commands:
 
 ```
 Fake-News-Project/
-├── news/                        # Main analysis directory
-│   ├── data/                    # Datasets (git-ignored large files)
+├── news/                              # Main analysis directory
+│   ├── data/                          # Working datasets (git-ignored large files)
 │   │   ├── 995,000_rows.csv
 │   │   ├── 995,000_rows_preprocessed.csv
 │   │   └── news_sample.csv
-│   ├── news_1_pl.ipynb          
-│   ├── news_part_1__2.ipynb     
-│   ├── news_part_2__1.ipynb     
-│   ├── news_part_3.ipynb        
-│   └── bert__1.ipynb            
-├── pyproject.toml               # Project config & dependencies
-├── Justfile                     # Task runner commands
-├── Project-description.md       # Full assignment description
-├── README.md                    
-├── .python-version              # Specifies Python 3.14
-├── .gitignore                   # Ignores venv, caches, etc.
-├── .venv/                       # Virtual environment (auto-created)
-└── uv.lock                      # Lockfile for reproducible installs
+│   ├── liar_dataset/                  # LIAR dataset (aggregated)
+│   │   ├── aggregated.csv
+│   │   ├── train.tsv
+│   │   ├── valid.tsv
+│   │   ├── test.tsv
+│   │   └── README
+│   ├── models/                        # Saved trained models (.pkl)
+│   ├── training_results/              # Model evaluation results
+│   ├── news_part_1.ipynb              # Part 1 – Data exploration & preprocessing
+│   ├── news_part_2.ipynb              # Part 2 – Logistic regression classifier
+│   ├── news_part_3__svm.ipynb         # Part 3 – SVM classifier
+│   ├── news_part_3__bert.ipynb        # Part 3 – BERT classifier
+│   ├── news_part_3__api_bert.ipynb    # Part 3 – BERT via API
+│   ├── news_part_3__other.ipynb       # Part 3 – Other classifiers
+│   ├── news_part_4.ipynb              # Part 4 – Analysis & comparison
+│   ├── news_part_5.ipynb              # Part 5 – Final results
+│   └── test_articles.txt              # Sample articles for testing
+├── src/                               # Python source modules
+├── pyproject.toml                     # Project config & dependencies
+├── Justfile                           # Task runner commands
+├── Project-description.md             # Full assignment description
+├── README.md
+├── .python-version                    # Specifies Python 3.14
+├── .gitignore                         # Ignores venv, caches, etc.
+├── .venv/                             # Virtual environment (auto-created)
+└── uv.lock                            # Lockfile for reproducible installs
 ```
-
-
----
-
-## Development Tools
-
-- **Ruff** – Linting and formatting
-- **ty** – Type checking
-- **pytest** – Testing framework
-
-Run `just format` before committing to keep the code clean!
-
----
-
-## Assignment Details
-
-Read `Project-description.md` for the full project requirements, deadlines, and deliverables.
